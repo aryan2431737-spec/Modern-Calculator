@@ -10,9 +10,6 @@
     <style>
         body {
             min-height: 100vh;
-            /* fallback for browsers that don't support gradients */
-            background: #f4f4f4;
-            /* Bootstrap gradient background */
             background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 50%, #c7d2fe 100%);
             font-family: Arial, sans-serif;
             transition: background 0.3s, color 0.3s;
@@ -139,6 +136,29 @@
             color: #222 !important;
             transition: box-shadow 0.2s, background 0.2s;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .calc-chat-col {
+                margin-bottom: 2rem;
+            }
+        }
+        @media (max-width: 767.98px) {
+            .display {
+                font-size: 1.1em;
+                height: 38px;
+            }
+            .button {
+                font-size: 1em;
+                padding: 10px 0;
+            }
+            .card {
+                padding: 1rem !important;
+            }
+            .chatbox {
+                max-width: 100% !important;
+            }
+        }
     </style>
 </head>
 
@@ -155,10 +175,11 @@
             <button class="theme-toggle ms-auto" id="themeToggle" onclick="toggleTheme()">🌞 Day Mode</button>
         </div>
     </nav>
-    <!-- Calculator Card -->
+    <!-- Calculator and Chatbox Side by Side on Desktop, Stacked on Mobile -->
     <div class="container py-5">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
+            <!-- Calculator -->
+            <div class="col-12 col-md-6 col-lg-5 calc-chat-col">
                 <div class="card p-4" id="container">
                     <h2 class="text-center mb-3">Calculator</h2>
                     <input type="text" id="display" class="display form-control mb-3" readonly />
@@ -194,10 +215,13 @@
                     </div>
                     <!-- BMI Calculator Modal Trigger -->
                     <div class="d-grid gap-2 mb-2">
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bmiModal">BMI
-                            Calculator</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bmiModal">BMI Calculator</button>
                     </div>
-                     <div class="col-md-6 col-lg-5 d-flex align-items-center">
+                    <div class="history" id="history"></div>
+                </div>
+            </div>
+            <!-- Chatbox -->
+            <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center calc-chat-col">
                 <div class="w-100">
                     <h4 class="text-center">Chatbox Calculator</h4>
                     <div class="chatbox" id="chatbox" style="max-width:400px;margin:auto;">
@@ -208,11 +232,6 @@
                             <button class="btn btn-secondary" id="voiceBtn">🎤</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-                    <div class="history" id="history"></div>
                 </div>
             </div>
         </div>
@@ -326,8 +345,50 @@
                 setTimeout(() => btn.classList.remove('glow'), 250);
             });
         });
-</script>
-<script src="calculator.js"></script>
+
+        // Chatbox logic
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messages = document.getElementById('messages');
+        const voiceBtn = document.getElementById('voiceBtn');
+
+        function handleChatInput(input) {
+            let expr = input.replace(/%/g, '/100');
+            let result;
+            try {
+                result = eval(expr);
+                messages.innerHTML += `<div><b>You:</b> ${input}</div><div><b>Calculator:</b> ${result}</div>`;
+            } catch {
+                messages.innerHTML += `<div><b>You:</b> ${input}</div><div><b>Calculator:</b> Error</div>`;
+            }
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        sendBtn.onclick = () => {
+            if (chatInput.value.trim() !== "") {
+                handleChatInput(chatInput.value.trim());
+                chatInput.value = "";
+            }
+        };
+        chatInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") sendBtn.onclick();
+        });
+
+        // Voice input (if supported)
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.onresult = function(event) {
+                chatInput.value = event.results[0][0].transcript;
+                sendBtn.onclick();
+            };
+            voiceBtn.onclick = () => recognition.start();
+        } else {
+            voiceBtn.disabled = true;
+            voiceBtn.title = "Voice not supported";
+        }
+    </script>
+    <script src="calculator.js"></script>
 </body>
 
 </html>
