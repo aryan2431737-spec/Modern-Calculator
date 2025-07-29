@@ -40,3 +40,10 @@ if ('webkitSpeechRecognition' in window) {
     voiceBtn.disabled = true;
     voiceBtn.title = "Voice not supported";
 }
+navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(stream => {
+    // Use the stream (e.g., for recording or voice commands)
+  })
+  .catch(error => {
+    console.error("Microphone access denied:", error);
+  });
