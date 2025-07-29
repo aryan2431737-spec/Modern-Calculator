@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            /* fallback for browsers that don't support gradients */
+            background: #f4f4f4;
+            /* Bootstrap gradient background */
+            background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 50%, #c7d2fe 100%);
+            font-family: Arial, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .card {
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .display {
+            width: 100%;
+            height: 48px;
+            font-size: 1.5em;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: right;
+            background: #f9f9f9;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            flex: 1 1 0;
+            margin: 0 4px;
+            padding: 16px 0;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 6px;
+            background: #e0e0e0;
+            color: #222;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .button:active {
+            background: #bdbdbd;
+        }
+
+        .button:last-child {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        .history {
+            margin-top: 18px;
+            background: #f1f8e9;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.95em;
+            min-height: 30px;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            display: block;
+            margin: 0 auto 18px auto;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: none;
+            background: #222;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Night (dark) theme */
+        body.night {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            color: #eee;
+        }
+
+        .card.night {
+            background: rgba(34, 34, 34, 0.98);
+            color: #eee;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .display.night {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .button.night {
+            background: #333;
+            color: #eee;
+        }
+
+        .button.night:active {
+            background: #444;
+        }
+
+        .button.night:last-child {
+            background: #388e3c;
+            color: #fff;
+        }
+
+        .history.night {
+            background: #263238;
+            color: #b2dfdb;
+        }
+
+        .theme-toggle.night {
+            background: #fff;
+            color: #222;
+        }
+
+        /* Glow effect for button press */
+        .button.glow {
+            box-shadow: 0 0 16px 4px #00e676, 0 0 8px 2px #2979ff;
+            background: #fffde7 !important;
+            color: #222 !important;
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Splash Screen -->
+    <div id="splash"
+        style="position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%);color:#222;font-size:2.2rem;font-weight:bold;letter-spacing:1px;">
+        Welcome to Aryan’s Logic Machine 🧠
+    </div>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">My Smart Calculator</span>
+            <button class="theme-toggle ms-auto" id="themeToggle" onclick="toggleTheme()">🌞 Day Mode</button>
+        </div>
+    </nav>
+    <!-- Calculator Card -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4" id="container">
+                    <h2 class="text-center mb-3">Calculator</h2>
+                    <input type="text" id="display" class="display form-control mb-3" readonly />
+                    <div class="row mb-2">
+                        <button class="button btn btn-light" onclick="clearDisplay()">C</button>
+                        <button class="button btn btn-light" onclick="backspace()">⌫</button>
+                        <button class="button btn btn-light" onclick="append('%')">%</button>
+                        <button class="button btn btn-light" onclick="append('/')">/</button>
+                    </div>
+                    <div class="row mb-2">
+                        <button class="button btn btn-light" onclick="append('7')">7</button>
+                        <button class="button btn btn-light" onclick="append('8')">8</button>
+                        <button class="button btn btn-light" onclick="append('9')">9</button>
+                        <button class="button btn btn-light" onclick="append('*')">*</button>
+                    </div>
+                    <div class="row mb-2">
+                        <button class="button btn btn-light" onclick="append('4')">4</button>
+                        <button class="button btn btn-light" onclick="append('5')">5</button>
+                        <button class="button btn btn-light" onclick="append('6')">6</button>
+                        <button class="button btn btn-light" onclick="append('-')">-</button>
+                    </div>
+                    <div class="row mb-2">
+                        <button class="button btn btn-light" onclick="append('1')">1</button>
+                        <button class="button btn btn-light" onclick="append('2')">2</button>
+                        <button class="button btn btn-light" onclick="append('3')">3</button>
+                        <button class="button btn btn-light" onclick="append('+')">+</button>
+                    </div>
+                    <div class="row mb-2">
+                        <button class="button btn btn-light" onclick="append('0')">0</button>
+                        <button class="button btn btn-light" onclick="append('.')">.</button>
+                        <button class="button btn btn-success" onclick="calculate()">=</button>
+                        <button class="button btn btn-warning" onclick="rewind()">⏪ Rewind</button>
+                    </div>
+                    <!-- BMI Calculator Modal Trigger -->
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bmiModal">BMI
+                            Calculator</button>
+                    </div>
+                     <div class="col-md-6 col-lg-5 d-flex align-items-center">
+                <div class="w-100">
+                    <h4 class="text-center">Chatbox Calculator</h4>
+                    <div class="chatbox" id="chatbox" style="max-width:400px;margin:auto;">
+                        <div class="messages" id="messages" style="height:120px;overflow-y:auto;border:1px solid #ccc;border-radius:6px;padding:8px;margin-bottom:8px;"></div>
+                        <div class="input-group">
+                            <input type="text" id="chatInput" class="form-control" placeholder="Type your calculation..." />
+                            <button class="btn btn-primary" id="sendBtn">Send</button>
+                            <button class="btn btn-secondary" id="voiceBtn">🎤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                    <div class="history" id="history"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- BMI Calculator Modal -->
+    <div class="modal fade" id="bmiModal" tabindex="-1" aria-labelledby="bmiModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="bmiModalLabel">BMI Calculator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="number" id="height" class="form-control mb-2" placeholder="Height (cm)">
+                    <input type="number" id="weight" class="form-control mb-2" placeholder="Weight (kg)">
+                    <button class="btn btn-success w-100" onclick="calculateBMI()">Calculate BMI</button>
+                    <div id="bmiResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS Bundle CDN (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Splash screen logic
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                document.getElementById('splash').style.display = 'none';
+            }, 2000); // 2 seconds
+        });
+    </script>
+    <script>
+        const display = document.getElementById('display');
+        const historyDiv = document.getElementById('history');
+        let history = [];
+        let historyIndex = -1;
+
+        function append(char) {
+            display.value += char;
+        }
+        function clearDisplay() {
+            display.value = '';
+        }
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+        }
+        function calculate() {
+            try {
+                let expr = display.value.replace(/%/g, '/100');
+                let result = eval(expr);
+                history.push(display.value); // Save the calculation
+                historyIndex = history.length - 1;
+                display.value = result;
+                updateHistory();
+            } catch {
+                display.value = 'Error';
+            }
+        }
+        function rewind() {
+            if (history.length > 0 && historyIndex >= 0) {
+                display.value = history[historyIndex];
+                historyIndex--;
+            }
+        }
+        function updateHistory() {
+            historyDiv.innerHTML = "<b>History:</b><br>" + history.map((h, i) => (i + 1) + ". " + h).join("<br>");
+        }
+
+        // BMI Calculator Function with colored category
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const bmiResult = document.getElementById('bmiResult');
+            if (!height || !weight || height <= 0 || weight <= 0) {
+                bmiResult.innerHTML = "<span class='text-danger'>Please enter valid height and weight.</span>";
+                return;
+            }
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+            let category = "";
+            let color = "#1976d2";
+            if (bmi < 18.5) { category = "Underweight"; color = "#fbc02d"; }
+            else if (bmi < 25) { category = "Normal"; color = "#388e3c"; }
+            else if (bmi < 30) { category = "Overweight"; color = "#f57c00"; }
+            else { category = "Obese"; color = "#d32f2f"; }
+            bmiResult.innerHTML = `Your BMI is <b>${bmi.toFixed(2)}</b> <span style="color:${color}">(${category})</span>`;
+        }
+
+        // Theme switching logic
+        const themeToggle = document.getElementById('themeToggle');
+        const container = document.getElementById('container');
+        function toggleTheme() {
+            document.body.classList.toggle('night');
+            container.classList.toggle('night');
+            display.classList.toggle('night');
+            historyDiv.classList.toggle('night');
+            document.querySelectorAll('.button').forEach(btn => btn.classList.toggle('night'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('night'));
+            themeToggle.classList.toggle('night');
+            if (document.body.classList.contains('night')) {
+                themeToggle.innerHTML = "🌙 Night Mode";
+            } else {
+                themeToggle.innerHTML = "🌞 Day Mode";
+            }
+        }
+
+        // Add glow effect to buttons on click
+        document.querySelectorAll('.button').forEach(btn => {
+            btn.addEventListener('click', function () {
+                btn.classList.add('glow');
+                setTimeout(() => btn.classList.remove('glow'), 250);
+            });
+        });
+</script>
+<script src="calculator.js"></script>
+</body>
+
+</html>
